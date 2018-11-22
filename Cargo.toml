@@ -1,12 +1,5 @@
-[package]
-name = "forge-reverse-proxy"
-version = "0.0.1"
-authors = [ "thomas.nicollet@epitech.eu" ]
-description = "A reverse proxy for forge Minecraft server"
-license = "GPLv3"
-repository = "https://github.com/nwmqpa/Forge-Reverse-Proxy"
-readme = "README.md"
-edition = "2018"
+[workspace]
 
-[dependencies]
-nom = "~4.1"
+members = [
+    "network-variables"
+]
