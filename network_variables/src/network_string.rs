@@ -30,7 +30,7 @@ impl NetworkString {
     /// assert_eq!((value.1).0, String::from("foo"));
     /// ```
     pub fn from_slice(bytes: &[u8]) -> nom::IResult<&[u8], Self> {
-        let length = VarInt::from_slice(bytes).unwrap();
+        let length = VarInt::from_slice(bytes)?;
         let bytes = length.0;
 
         if bytes.len() < (length.1).0 as usize {

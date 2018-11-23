@@ -10,8 +10,15 @@ fn handle_client(stream: &mut TcpStream) {
         stream.read_to_end(&mut buf).expect("IO error");
         break;
     };
-    println!("{:?}", buf);
-    println!("bytes: {:?}", packets::login::login(buf.as_slice()));
+    while buf.len() > 0 {
+        let result =  packets::parse_packet(buf.as_slice());
+        if let Ok(date) = result {
+            println!("packet: {:?}", date.1);
+            buf = date.0.to_vec();
+        } else if let Err(a) = result { // Taimerais faire un truc genre OOOOOOOOh je sais pas si sa marche 
+            eprintln!("Error.... {:?}", a);
+        }
+    }
 }
 
 fn main() -> io::Result<()> {

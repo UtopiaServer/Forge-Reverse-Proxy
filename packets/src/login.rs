@@ -1,16 +1,27 @@
 
-use super::{Packet, nom, parse_varint, parse_network_string};
+use super::{PacketData, nom, parse_varint, parse_network_string};
 
 use nom::be_u16;
 
-named!(pub login<&[u8], Packet>,
+named!(pub handshake<&[u8], PacketData>,
     do_parse!(
-        length: parse_varint >>
-        id: parse_varint >>
         protocol: parse_varint >>
         host: parse_network_string >>
         port: be_u16 >>
         status: parse_varint >>
-        (Packet::Log { length, id, protocol, host, port, status})
+        (PacketData::Handshake {protocol, host, port, status})
+    )
+);
+
+named!(pub login_start<&[u8], PacketData>,
+    do_parse!(
+        username: parse_network_string >>
+        (PacketData::Login {username})
+    )
+);
+
+named!(pub status<&[u8], PacketData>,
+    do_parse!(
+        (PacketData::Status)
     )
 );
