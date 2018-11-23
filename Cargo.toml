@@ -1,5 +1,7 @@
 [workspace]
 
 members = [
-    "network-variables"
+    "network_variables",
+    "packets",
+    "main"
 ]

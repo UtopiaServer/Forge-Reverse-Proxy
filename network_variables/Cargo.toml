@@ -5,5 +5,4 @@ authors = ["Thomas Nicollet <thomasnicollet@yahoo.fr>"]
 edition = "2018"
 
 [dependencies]
-overflower = "0.4.6"
-overflower_support = "0.1.5"
+nom = '4.0'
