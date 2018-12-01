@@ -3,5 +3,6 @@
 members = [
     "network_variables",
     "packets",
-    "main"
+    "main",
+    "player"
 ]
