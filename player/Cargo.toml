@@ -1,0 +1,10 @@
+[package]
+name = "player"
+version = "0.1.0"
+authors = ["afourcat <alexandre.fourcat@epitech.eu>"]
+edition = "2018"
+
+[dependencies]
+reqwest = "*"
+serde_derive = "*"
+serde = "*"
