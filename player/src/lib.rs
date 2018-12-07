@@ -2,93 +2,87 @@
 //! Player lib
 //! Handle Player and system
 //!
-#![feature(custom_attribute)]
-extern crate reqwest;
+extern crate lightql;
+
 #[macro_use]
 extern crate serde_derive;
 
-/// Structure for the player position
-//pub struct Player {
-//    position: Position
-//}
+use lightql::{
+    Request,
+    QlType,
+    QlError
+};
 
+#[derive(Deserialize, Serialize, Debug)]
 struct Position {
     x: f64,
     y: f64,
     z: f64,
-    dimension: i32,
+    dim: i32,
 }
 
-impl Position {
-    fn new(x: f64, y: f64, z: f64, dimension: i32) -> Self {
-        Self {
-            x,
-            y,
-            z,
-            dimension
-        }
-    }
-}
-
-#[derive(Deserialize, Debug)]
-struct Data {
-    data: Player
-}
-
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 struct Player {
-    players: Uuid
+    uuid: String,
+    position: Option<Position>
 }
 
-#[derive(Deserialize, Debug)]
-struct Uuid {
-    uuid: std::collections::HashMap<String, String>
+#[derive(Deserialize, Serialize, Debug)]
+struct PlayersRequest {
+    players: Vec<Player>
 }
 
-fn request_player(uuid: String) {
-    let client = reqwest::Client::new();
+#[derive(Deserialize, Serialize, Debug)]
+struct PlayerRequest {
+    player: Player
+}
 
-    let query = format!("
-    {{
-        players(uuid:\"{}\") {{
-            uuid
-        }}
-    }}", uuid);
+/// Fetch all players from @uri
+fn fetch_players(uri: &str) -> Result<Vec<Player>, QlError> {
+    let query = "{ players { uuid, position { x, y, z, dim } } }";
 
-    println!("{}", query);
+    let players = Request::new(query, QlType::Query)
+        .send::<PlayersRequest>(uri)?;
+    Ok(players.players)
+}
 
-    let mut res = client
-        .post("https://api.utopia-server.com/")
-        .body(query)
-        .header("content-type", "application/graphql")
-        .send()
-        .unwrap();
-
-    //println!("{}", res.text().unwrap());
-
-    let response: Data = res
-        .json()
-        .unwrap();
-
-    println!("{:#?}", response);
+/// Fetch a player from the @uri with @uuid as index.
+fn fetch_player(uuid: &str, uri: &str) -> Result<Player, QlError> {
+    let mut hashmap = std::collections::HashMap::new();
+    hashmap.insert(
+        String::from("_uuid"),
+        String::from(uuid),
+    );
+    let player_req = Request::from_path("ql/request_player.query")
+        .unwrap()
+        .prepare(Some(hashmap))?
+        .send::<PlayerRequest>(uri)?;
+    Ok(player_req.player)
 }
 
 #[cfg(test)]
 mod test {
 
-    const UUID: [&'static str; 3] = [
-        "8603f518-c2f1-407d-b019-90aa022e22bf",
-        "d28e5f13-4b84-44ce-9d32-51f1b569adda",
-        "ddd122ed-232f-4d72-a8a7-2a722193de84"
-    ];
-
     #[test]
-    fn req_player() {
-        super::request_player(UUID[0].to_string());
+    fn test_all_players() {
+        let players = super::fetch_players("https://api.utopia-server.com/").unwrap();
+        println!("{:#?}", players);
     }
 
+    #[test]
+    fn test_all_players_filter() {
+        let players: Vec<super::Player> = super::fetch_players("https://api.utopia-server.com/")
+            .unwrap()
+            .into_iter()
+            .filter(|x| x.position.is_some())
+            .collect();
+        println!("{:#?}", players);
+    }
+
+    #[test]
+    fn test_one_player() {
+        let player = super::fetch_player("ddd122ed-232f-4d72-a8a7-2a722193de84", "https://api.utopia-server.com/").unwrap();
+        println!("{:#?}", player);
+    }
+    
 }
-
-
-
-

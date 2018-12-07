@@ -5,6 +5,6 @@ authors = ["afourcat <alexandre.fourcat@epitech.eu>"]
 edition = "2018"
 
 [dependencies]
-reqwest = "*"
-serde_derive = "*"
+lightql = { git = "https://github.com/Afourcat/LightQl" }
 serde = "*"
+serde_derive = "*"

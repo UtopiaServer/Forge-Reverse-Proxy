@@ -1,0 +1,11 @@
+{
+    player(uuid: "_uuid") {
+        uuid,
+        position {
+            x,
+            y,
+            z,
+            dim
+        }
+    }
+}
